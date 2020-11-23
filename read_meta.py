@@ -1,5 +1,7 @@
 import xml.etree.ElementTree as ET
 from create_meta import create_meta, convert_location
+from pathlib import Path
+import argparse
 
 
 def extract_from_filename(xml_node_filename):
@@ -24,31 +26,45 @@ def get_tile_size(xml_image_node):
     return tile_size
 
 
-path_to_meta = 'C:/temp/temp/191114_hBrest_rep_b4-1-MIP_info.xml'
+def main(args):
+    xml = ET.parse(args.czi_xml)
 
-xml = ET.parse(path_to_meta)
+    image_nodes = xml.findall('Image')
 
+    arrangement = {}
 
-image_nodes = xml.findall('Image')
-
-arrangement = {}
-
-for image in image_nodes:
-    channel_id, tile_id, x, y = extract_position(image.find('Bounds'))
-    location = convert_location(x, y)
-    if channel_id in arrangement:
-        if tile_id not in arrangement[channel_id]:
-            arrangement[channel_id][tile_id] = location
-    else:
-        arrangement[channel_id] = {tile_id: location}
+    for image in image_nodes:
+        channel_id, tile_id, x, y = extract_position(image.find('Bounds'))
+        location = convert_location(x, y)
+        if channel_id in arrangement:
+            if tile_id not in arrangement[channel_id]:
+                arrangement[channel_id][tile_id] = location
+        else:
+            arrangement[channel_id] = {tile_id: location}
 
 
-channel1 = arrangement[0]
-num_tiles = max(channel1.keys()) + 1
-tile_locations = list(channel1.values())
-pattern_str = '191114_hBrest_rep_b4-1-MIP_m{xxx}_DAPI_ORG.tif'
-tile_size = get_tile_size(image_nodes[0])
-bs_xml = create_meta(pattern_str, num_tiles, tile_size, tile_locations)
-with open('./dataset_gen.xml', 'w') as s:
-    s.write(bs_xml)
+    channel1 = arrangement[0]
+    num_tiles = max(channel1.keys()) + 1
+    tile_locations = list(channel1.values())
+
+    tile_size = get_tile_size(image_nodes[0])
+    bs_xml = create_meta(args.pattern_str, num_tiles, tile_size, tile_locations, args.data_dir)
+    with open('%s/%s_for_bs.xml' %(args.out, Path(args.czi_xml).stem), 'w') as s:
+        s.write(bs_xml)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-czi_xml", type=str,
+            required=True)
+    parser.add_argument("-pattern_str", type=str,
+            default="191114_hBrest_rep_b4-1-MIP_m{xxx}_DAPI_ORG.tif")
+    parser.add_argument("-out", type=str,
+            default="/nfs/team283_imaging/test_stitching/Tong")
+    parser.add_argument("-data_dir", type=str,
+            default="/data/")
+
+    args = parser.parse_args()
+
+    main(args)
 
