@@ -2,15 +2,15 @@ import xml.etree.ElementTree as ET
 from copy import deepcopy
 
 
-def create_meta(file_pattern_str, num_tiles, tile_size, tile_locations):
+def create_meta(file_pattern_str, num_tiles, tile_size, tile_locations, tile_folder):
 
     root = ET.Element('SpimData', {'version': '0.2'})
-    base_path = ET.SubElement(root, 'BasePath', {'type': 'relative'}).text = '.'
+    base_path = ET.SubElement(root, 'BasePath', {'type': 'absolute'}).text = tile_folder
     sequence_description = ET.SubElement(root, 'SequenceDescription')
 
     # <ImageLoader>
     image_loader = ET.SubElement(sequence_description, 'ImageLoader', {'format': 'spimreconstruction.stack.loci'})
-    ET.SubElement(image_loader, 'imagedirectory', {'type': 'relative'}).text = '.'
+    ET.SubElement(image_loader, 'imagedirectory', {'type': 'absolute'}).text = tile_folder
     ET.SubElement(image_loader, 'filePattern').text = file_pattern_str
     ET.SubElement(image_loader, 'layoutTimepoints').text = '0'
     ET.SubElement(image_loader, 'layoutChannels').text = '0'
