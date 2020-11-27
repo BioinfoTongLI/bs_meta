@@ -17,6 +17,8 @@ process generate_macro_for_fuse {
     publishDir params.out_dir + "BigStitcher_ijms", mode:"copy"
     /*input:*/
 
+    queue 'imaging'
+
     output:
     path "*.ijm" into fuse_ijms
 
@@ -31,6 +33,8 @@ process generate_macro_for_fuse {
 process generate_xml_per_channel {
     echo true
     publishDir params.out_dir + "BigStitcher_confs", mode:"copy"
+
+    queue 'imaging'
 
     input:
     path macro from fuse_ijms
@@ -52,6 +56,8 @@ process fuse {
     echo true
     container "gitlab-registry.internal.sanger.ac.uk/tl10/img-fiji"
     containerOptions "-v " + params.img_dir + ":/data/:ro -v " + params.out_dir + "fused/:/fused/"
+
+    queue 'imaging'
 
     input:
     path xml from xml_for_diff_chs
