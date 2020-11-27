@@ -57,6 +57,7 @@ process fuse {
     container "gitlab-registry.internal.sanger.ac.uk/tl10/img-fiji"
     containerOptions "-v " + params.img_dir + ":/data/:ro -v " + params.out_dir + "fused/:/fused/"
 
+    cpus 20
     queue 'imaging'
 
     input:
@@ -72,6 +73,6 @@ process fuse {
     ls /xml_folder/
     #more /xml_folder/$xml
     more $ijm
-    /Fiji.app/ImageJ-linux64 --ij2 --headless --console --cpus-per-task=16 -macro $ijm
+    /Fiji.app/ImageJ-linux64 --ij2 --headless --console --cpus-per-task=20 -macro $ijm
     """
 }
