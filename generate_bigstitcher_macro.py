@@ -82,7 +82,7 @@ class BigStitcherMacro:
     estimate_stitch_param_macro_template = """
     // calculate pairwise shifts
     run("Calculate pairwise shifts ...",
-        "select={path_to_xml_file}" +
+        "select=[{path_to_xml_file}]" +
         " process_angle=[All angles]" +
         " process_channel=[All channels]" +
         " process_illumination=[All illuminations]" +
@@ -98,7 +98,7 @@ class BigStitcherMacro:
 
     // filter shifts with 0.7 corr. threshold
     run("Filter pairwise shifts ...",
-        "select={path_to_xml_file}" +
+        "select=[{path_to_xml_file}]" +
         " filter_by_link_quality" +
         " min_r=0.7" +
         " max_r=1" +
@@ -109,7 +109,7 @@ class BigStitcherMacro:
 
     // do global optimization
     run("Optimize globally and apply shifts ...",
-        "select={path_to_xml_file}" +
+        "select=[{path_to_xml_file}]" +
         " process_angle=[All angles]" +
         " process_channel=[All channels]" +
         " process_illumination=[All illuminations]" +
@@ -161,7 +161,7 @@ class FuseMacro:
     fuse_macro_template = """
     // fuse dataset, save as TIFF
     run("Fuse dataset ...",
-        "select={path_to_xml_file}" +
+        "select=[{path_to_xml_file}]" +
         " process_angle=[All angles]" +
         " process_channel=[All channels]" +
         " process_illumination=[All illuminations]" +
