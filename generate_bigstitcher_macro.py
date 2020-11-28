@@ -66,7 +66,7 @@ class BigStitcherMacro:
         return formatted_macro
 
 
-    def write_to_temp_macro_file(self, formatted_macro):
+    def write_to_temp_macro_file(elf, formatted_macro):
         file_name = 'reg' + str(self.region) + '_bigstitcher_macro.ijm'
         macro_file_path = self.out_dir.joinpath(file_name)
         with open(macro_file_path, 'w') as f:
@@ -176,6 +176,6 @@ class FuseMacro:
         " blend produce=[Each timepoint & channel]" +
         " fused_image=[Save as (compressed) TIFF stacks]" +
         " output_file_directory={out_dir}" +
-        " filename_addition=DAPI");
+        " filename_addition=[DAPI]");
 
     """

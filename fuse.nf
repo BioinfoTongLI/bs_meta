@@ -65,7 +65,7 @@ process fuse {
     cp $xml /xml_folder/
     ls /xml_folder/
     #more /xml_folder/$xml
-    more $ijm
     /Fiji.app/ImageJ-linux64 --ij2 --headless --console --cpus-per-task=16 -macro $ijm
+    more $ijm
     """
 }
