@@ -16,15 +16,22 @@ czi_xml_path = params.img_dir + params.czi_xml
 process generate_xml_for_bigstitcher {
     /*echo true*/
     publishDir params.out_dir + "BigStitcher_xmls", mode:"copy"
+    container "/lustre/scratch117/cellgen/team283/BigStitcher_stitching/ImageAnalysis_cpu.sif"
+    containerOptions "-B /lustre:/lustre:ro,/nfs:/nfs:ro"
 
-    /*input:*/
+    queue "imaging"
+
+    input:
+    path xml from czi_xml_path
+    val dapi_pattern from params.dapi_pattern
 
     output:
     path "*.xml" into bigstitcher_xml
 
     script:
     """
-    python ${workflow.projectDir}/read_meta.py -czi_xml $czi_xml_path -out "./" -pattern_str ${params.dapi_pattern}
+    ls -lh /nfs/
+    python ${baseDir}/read_meta.py -czi_xml ${xml} -out "./" -pattern_str ${dapi_pattern}
     """
 }
 
@@ -32,33 +39,39 @@ process generate_xml_for_bigstitcher {
 process generate_ijm_for_fiji {
     echo true
     publishDir params.out_dir + "BigStitcher_ijms", mode:"copy"
+    container "/lustre/scratch117/cellgen/team283/BigStitcher_stitching/ImageAnalysis_cpu.sif"
+    containerOptions "-B /lustre:/lustre:ro,/nfs/:/nfs/"
+
+    queue "imaging"
 
     input:
     path xml from bigstitcher_xml
+    val dapi_pattern from params.dapi_pattern
 
     output:
     path "*.ijm" into ijm_scripts
 
     script:
     """
-    python ${workflow.projectDir}/generate_macro_for_tile_shift_estimation.py -xml ${xml} -img_dir "/data/" -pattern_str ${params.dapi_pattern} -xml_folder "/xml_folder/"
+    python ${workflow.projectDir}/generate_macro_for_tile_shift_estimation.py -xml ${xml} -img_dir "/data/" -pattern_str ${dapi_pattern} -xml_folder "/xml_folder/"
     """
 }
 
 
 process calculate_pairwise_shifts {
     echo true
-    container "gitlab-registry.internal.sanger.ac.uk/tl10/img-fiji"
-    containerOptions "-v " + params.img_dir + ":/data/ -v " + params.out_dir + "BigStitcher_xmls:/xml_folder/"
+    container "/lustre/scratch117/cellgen/team283/BigStitcher_stitching/fiji.sif"
+    containerOptions "-B " + params.img_dir + ":/data/," + params.out_dir + "BigStitcher_xmls:/xml_folder/,/lustre:/lustre:ro"
+
+    queue "imaging"
 
     input:
-    path macro from ijm_scripts
+    file macro from ijm_scripts
 
     script:
     """
     #ls /xml_folder/
     #ls /data/
-    /Fiji.app/ImageJ-linux64 --ij2 --headless --console --cpus-per-task=16 -macro $macro
-    more $macro
+    /Fiji.app/ImageJ-linux64 --ij2 --headless --console --cpus-per-task=12 -macro ${macro}
     """
 }
