@@ -24,7 +24,7 @@ process generate_xml_for_bigstitcher {
 
     script:
     """
-    python ${baseDir}/read_meta.py -czi_xml $czi_xml_path -out "./" -pattern_str ${params.file_pattern}
+    python3 ${baseDir}/read_meta.py -czi_xml $czi_xml_path -out "./" -pattern_str ${params.file_pattern}
     """
 }
 
@@ -41,7 +41,7 @@ process generate_ijm_for_fiji {
 
     script:
     """
-    python ${baseDir}/generate_macro_for_tile_shift_estimation.py -xml ${xml} -img_dir "/data/" -pattern_str ${params.file_pattern} -xml_folder "/xml_folder/"
+    python3 ${baseDir}/generate_macro_for_tile_shift_estimation.py -xml ${xml} -img_dir "/data/" -pattern_str ${params.file_pattern} -xml_folder "/xml_folder/"
     """
 }
 
